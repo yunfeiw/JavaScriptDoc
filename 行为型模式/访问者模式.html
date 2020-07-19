@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>访问者模式</title>
+</head>
+
+<body>
+    <h3>访问者模式</h3>
+    <p>
+        访问者模式是一种将算法与对象结构分离的设计模式,通俗点将,访问模式然我们在不改变一个对象结构的前提下能够给该对象增加新的逻辑
+    </p>
+    <script>
+        function Employee(name, salary) {
+            this.name = name;
+            this.salary = salary;
+        }
+
+        Employee.prototype = {
+            getSalary: function () {
+                return this.salary;
+            },
+            setSalary: function (salary) {
+                this.salary = salary;
+            },
+            accept: function (visitor) {
+                visitor.visit(this);
+            }
+        }
+        function Visitor() { }
+
+        Visitor.prototype = {
+            visit: function (employee) {
+                employee.setSalary(employee.getSalary() * 2);
+            }
+        }
+        const employee = new Employee('bruce', 1000);
+        const visitor = new Visitor();
+        employee.accept(visitor);
+
+        console.log(employee.getSalary());
+    </script>
+</body>
+
+</html>

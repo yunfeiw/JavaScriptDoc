@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>迭代器模式</title>
+</head>
+
+<body>
+    <h3>
+        迭代器模式
+    </h3>
+    <ul>
+
+        <li>
+            提供一直的遍历各种数据结构的方式，而不用了解数据的内部结构。
+        </li>
+        <li>
+            提供遍历容器（集合）的能力而无需更改容器的接口。
+        </li>
+        <li>
+            遍历器需要实现以下接口
+        </li>
+        <li>
+            hasNext():判断迭代是否结束，返回boolean
+        </li>
+        <li>
+            next():查找并返回下一个元素
+        </li>
+    </ul>
+    <h3>ES6提供简单的迭代循环语法语法</h3>
+
+    <script>
+        function Iterator(items) {
+            this.items = items;
+            this.index = 0;
+        }
+        Iterator.prototype.hasNext = function () {
+            return this.index < this.items.length;
+        }
+        Iterator.prototype.next = function () {
+            return this.items[this.index++];
+        }
+
+        // 迭代语法
+        function Range(start, end) {
+            return {
+                [Symbol.iterator]: function () {
+                    return {
+                        next() {
+                            if (start < end) {
+                                return { value: start++, done: false }
+                            }
+                            return { done: true, value: end }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

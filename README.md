@@ -1,2 +1,3 @@
 # JavaScriptDoc
-简单的记录
+
+设计模式

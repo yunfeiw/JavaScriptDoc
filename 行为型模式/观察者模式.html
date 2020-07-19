@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>观察这模式</title>
+</head>
+
+<body>
+    <h3>观察者模式</h3>
+    <p>
+        观察者模式又称发布订阅模式:描述,被观察对象(subject)维护一组观察者(observer),当被观察对象改变时,待用观察者的某个方法将这些变化通知到观察者.
+    </p>
+    <script>
+        function subject() {
+            this.observers = []
+        }
+        subject.prototype.add = function (fn) {
+            this.observers.push(fn);
+        }
+        subject.prototype.fire = function () {
+            this.observers.forEach((e) => {
+                e.call()
+            })
+        }
+        subject.prototype.unSubject = function (observerToRemove) {
+            this.observers = this.observers.filter(observer => {
+                return observer !== observerToRemove;
+            })
+        }
+    </script>
+</body>
+
+</html>

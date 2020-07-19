@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中介者模式</title>
+</head>
+
+<body>
+    <h3>中介者模式</h3>
+    <p>中介者包装了一些列对象相互作用的方式,使得这些对象不必直接相互作用,而是有中介者协调他们之间的交互,使得他们松耦合</p>
+    <p>当某些对象之间的作用发生变化时,不会立即影响到其他的一些对象之间的作用.</p>
+    <p>其与观察者相似,都是一对多的关系,也是集中通信,不同的是中介者模式是处理统计对象间的交互,而观察者模式是处理observer和subject之间的交互</p>
+    <script>
+        //聊天成员
+        function Member(name) {
+            this.name = name;
+            this.chatroom = null
+        }
+        Member.prototype = {
+            send: function (msg, toMember) {
+                this.chatroom.send(msg, this, toMember);
+            },
+            receive: function (message, fromMember) {
+                console.log(`${fromMember.name} to ${this.name}: ${message}`);
+            }
+
+        }
+        //聊天室类
+        function Chatroom() {
+            this.members = {};
+        }
+
+        Chatroom.prototype = {
+            // 增加成员
+            addMember: function (member) {
+                this.members[member.name] = member;
+                member.chatroom = this;
+            },
+            // 发送消息
+            send: function (message, fromMember, toMember) {
+                toMember.receive(message, fromMember);
+            }
+        }
+    </script>
+</body>
+
+</html>
