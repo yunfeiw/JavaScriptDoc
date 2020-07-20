@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>外观模式</title>
+  </head>
+  <body>
+    <h3>外观模式</h3>
+    <p>为子系统中的一组接口提供一个统一的高层接口，使子系统更容易使用。</p>
+    <p>简而言之，将多个子系统中复杂的逻辑进行抽象，从而提供一个更同意，更简洁、更易懂的API</p>
+    <button id="btn">点击</button>
+    <script>
+      function addEvent(element, event, handler) {
+        if (element.addEventListener) {
+          element.addEventListener(event, handler);
+        } else if (element.attachEvent) {
+          element.attachEvent("on" + event, handler);
+        } else {
+          element["on" + event] = fn;
+        }
+      }
+      function removeEvent(element, event, handler) {
+        if (element.removeEventListener) {
+          element.removeEventListener(event, handler, false);
+        } else if (element.detachEvent) {
+          element.detachEvent("on" + event, handler);
+        } else {
+          element["on" + event] = null;
+        }
+      }
+      var btn = document.getElementById("btn");
+      addEvent(btn, "click", function () {
+        alert(123);
+      });
+    </script>
+  </body>
+</html>
