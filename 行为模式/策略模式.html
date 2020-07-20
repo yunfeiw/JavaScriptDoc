@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>策略模式</title>
+  </head>
+  <body>
+    <h3>策略模式</h3>
+    <p>
+      策略模式简单魔术就是：对象有摸个行，但是在不同的场景中，该行为有不同的实现算法
+    </p>
+    <p>
+      策略模式的场景如登录鉴权，鉴权算法取决于用的登录方式是手机、邮箱等。登录方式在运行时才获取，获取到登录方式后再动态的配置鉴权策略。
+    </p>
+    <p>这些策略应该实现统一的接口，或者有统一的行为模式</p>
+    <dl>
+      <dt>优势</dt>
+      <dd>方便在运行时切换算法和策略</dd>
+      <dd>代码更简洁，避免使用大量的条件判断</dd>
+      <dd>
+        关注分离，每个startegy类控制自己的算法逻辑，startegy和其使用者之间也互相独立
+      </dd>
+    </dl>
+    <script>
+      // 登录控制器
+      function loginController() {
+        this.strategy = null;
+        this.setStrategy = function (strategy) {
+          this.strategy = strategy;
+          this.login = this.startegy.login;
+        };
+      }
+      // 用户名，密码登录
+      function LocalStragegy() {
+        this.login = ({ username, password }) => {
+          console.log(username, password);
+        };
+      }
+      //电话号登录
+      function PhoneStragety() {
+        this.login = ({ phone, verifyCode }) => {
+          console.log(phone, verifyCode);
+        };
+      }
+
+      // 调用手机、验证码登录接口，使用PhoneStrategy
+      app.use("/login/phone", function (req, res) {
+        loginController.setStrategy(new PhoneStragety());
+        loginController.login(req.body);
+      });
+
+      // 调用用户名登录接口，使用LocalStragegy
+      app.use("/login/social", function (req, res) {
+        loginController.setStrategy(new LocalStragegy());
+        loginController.login(req.body);
+      });
+    </script>
+  </body>
+</html>

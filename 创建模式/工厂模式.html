@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>工厂模式</title>
+  </head>
+  <body>
+    <h3>工厂函数</h3>
+    <p>
+      当构造函数过多，不方便管理，且需要创建的对象之间存在默写关联（有用一个父类、实现同一个接口等）时，不妨使用工厂模式
+    </p>
+    <p>工厂模式提供一种集中化、统一话的方式，避免了分散创建导致的代码重复，灵活性差的问题</p>
+    <script>
+      function xiache(color) {
+        console.log("xiaoche");
+        this.color = color;
+        this.brand = "xiaoche";
+      }
+      function dache(color) {
+        console.log("dache");
+        this.color = color;
+        this.brand = "dache";
+      }
+      function huoche(color) {
+        console.log("huoche");
+        this.color = color;
+        this.brand = "huoche";
+      }
+      //枚举
+      const BRANDS = {
+        xiaoche: 1,
+        dache: 2,
+        huoche: 3,
+      };
+      //汽车工厂
+      function CarFactory() {
+        this.create = function (brand, color) {
+          switch (brand) {
+            case BRANDS.xiaoche:
+              return new xiache(color);
+              break;
+            case BRANDS.dache:
+              return new dache(color);
+              break;
+            case BRANDS.huoche:
+              return new dache(color);
+              break;
+            default:
+              break;
+          }
+        };
+      }
+      var carFactory = new CarFactory();
+      var colors = ["red", "yellow", "green"];
+      let btnlist = document.createDocumentFragment();
+
+      for (var i = 0; i < 3; i++) {
+        let dom = document.createElement("button");
+        let txt = document.createTextNode("按钮" + i);
+        dom.appendChild(txt);
+        dom.addEventListener("click", carFactory.create(i, colors[i]));
+        btnlist.append(dom);
+      }
+      console.log(btnlist);
+      document.getElementsByTagName("body")[0].appendChild(btnlist);
+    </script>
+  </body>
+</html>

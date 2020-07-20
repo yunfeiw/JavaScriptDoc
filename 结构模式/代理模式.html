@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>代理模式</title>
+  </head>
+  <body>
+    <h3>代理模式</h3>
+    <p>代理模式可以解决一下的问题：</p>
+    <ul>
+        <li>增加对一个对象的访问控制</li>
+        <li>当访问一个对象的过程需要增加额外的逻辑</li>
+    </ul>
+    <script>
+      //创建节点
+      var dom = document.createElement("button");
+      var txt = document.createTextNode("数据");
+      dom.appendChild(txt);
+      document.getElementsByTagName("body")[0].insertAdjacentElement('beforebegin', dom);
+      document.getElementsByTagName("body")[0].insertAdjacentElement('afterbegin',dom.cloneNode(true));
+
+    console.log(dom.isEqualNode(dom.cloneNode(true)))
+
+      const apple = new StockPriceAPIProxy();
+      dom.addEventListener("click", function () {
+        apple.getValue("GOOGL", () => alert("正好"));
+      });
+      function stockPriceAPI() {
+        this.getValue = function (stock, callback) {
+          console.log("call");
+          setTimeout(() => {
+            switch (stock) {
+              case "GOOGL":
+                callback("$1265.23");
+                break;
+              case "AAPL":
+                callback("$287.05");
+                break;
+              case "MSFT":
+                callback("$173.70");
+                break;
+              default:
+                callback("");
+            }
+          }, 3000);
+        };
+      }
+      function StockPriceAPIProxy() {
+        //缓存对象
+        this.cache = {};
+        //真实api
+        this.realAPI = new stockPriceAPI();
+        this.getValue = function (stock, callback) {
+          const cachedPrice = this.cache[stock];
+          if (cachedPrice) {
+            console.log("Got price from cache");
+            callback(cachedPrice);
+          } else {
+            this.realAPI.getValue(stock, (price) => {
+              this.cache[stock] = price;
+              callback(price);
+            });
+          }
+        };
+      }
+    </script>
+  </body>
+</html>
