@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+  </head>
+  <body>
+    <button id="bnt1">1</button>
+    <button id="bnt2">2</button>
+    <button id="bnt3">3</button>
+    <script>
+      $(
+        (function () {
+          function initEvents() {
+            for (var i = 1; i <= 3; i++) {
+              (function (i) {
+                $("#bnt" + i).on("click", function () {
+                  alert(i);
+                });
+              })(i);
+            }
+          }
+          initEvents();
+        })()
+      );
+    </script>
+  </body>
+</html>
