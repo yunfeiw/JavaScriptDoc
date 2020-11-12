@@ -1,47 +1,56 @@
-function cloneLoop(x) {
-  const root = {};
+// function a(i, sum) {
+//     if (i <= 0) { return sum }
+//     sum += i;
+//     return arguments.callee(--i, sum)
+// }
 
-  // 栈
-  const loopList = [
-    {
-      parent: root,
-      key: undefined,
-      data: x,
-    }
-  ];
+// (function foo() {
+//     console.log('这是foo')
+// })()
+// var obj = { name: 'yunfei', age: 18 };
+// (function () {
+//     console.log(arguments)
+// })(obj);
+// undefined = true; // 给其他代码挖了一个大坑！绝对不要这样做！
+// (function IIFE(undefined) {
+//     var a;
+//     if (a === undefined) {
+//     }
+// })();
 
-  while (loopList.length) {
-    // 深度优先
-    const node = loopList.pop();
-    const parent = node.parent;
-    const key = node.key;
-    const data = node.data;
+// (function (foo) {
+//     foo("yunfei")
+// }(function (arg) {
+//     console.log(arg)
+// }))
 
-    // 初始化赋值目标，key为undefined则拷贝到父元素，否则拷贝到子元素
-    let res = parent;
-    console.log(res)
-    if (typeof key !== 'undefined') {
-      res = parent[key] = {};
-    }
+// for (var i = 0; i < 10; i++) {
+//     console.log(i)
+// }
+// console.log(i)
 
-    for (let k in data) {
-      if (data.hasOwnProperty(k)) {
-        if (typeof data[k] === 'object') {
-          // 下一次循环
-          loopList.push({
-            parent: res,
-            key: k,
-            data: data[k],
-          });
-        } else {
-          res[k] = data[k];
-        }
-      }
-    }
-  }
+// function foo(num) {
+//     console.log("foo: " + num);
+//     console.log("foo: " + this.count);
+//     // 记录 foo 被调用的次数
+//     this.count++;
+// }
+// foo.count = 0;
+// var i;
+// for (i = 0; i < 10; i++) {
+//     if (i > 5) {
+//         foo(i);
+//     }
+// }
+// var obj ={name:'yunfei'}
+// var arr = [1,2,3,4,5]
+// arr.forEach(function (e){
+//     console.log(e)
+//     console.log(this.name)
+// },obj)
 
-  return root;
-}
-console.log(
-  cloneLoop({ a: '云飞', b: { c: 1, d: 2 }, e: [1, 2, 3, 4] })
-)
+var array = [1, 2, 3, 4]
+console.log("length-before", array.length)
+delete array[3]
+console.log(array)
+console.log("length-end", array.length)
