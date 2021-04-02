@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代理模式</title>
+</head>
+
+<body>
+    <script>
+        class WProxy {
+            constructor(op) {
+                const img = document.createElement('img');
+                this.img = img;
+                img.src = op;
+                document.body.appendChild(img);
+            }
+            setSrc(src) {
+                this.img.src = src;
+            }
+        }
+
+        function loadImg(src) {
+            let nimg = new WProxy('./img/loading.jpg');
+            const imgs = new Image();
+            imgs.src = src;
+            imgs.onload = function () {
+                nimg.setSrc(src)
+            }
+        }
+        loadImg(
+            'https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1249633517,2092238595&fm=26&gp=0.jpg')
+    </script>
+</body>
+
+</html>
