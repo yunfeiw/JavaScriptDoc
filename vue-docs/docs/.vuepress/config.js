@@ -16,13 +16,17 @@ module.exports = {
             }, {
                 text: '学习笔记',
                 items: [
-                    { text: '笔记', link: '/type/' }, // 可不写后缀 .md
-                    { text: '其它链接', link: 'https://www.baidu.com/' }// 外部链接
+                    { text: 'vue响应式原理', link: '/type/' }, // 可不写后缀 .md
+                    { text: 'vue-router原理', link: 'https://www.baidu.com/' },// 外部链接
+                    { text: 'vuex原理', link: 'https://www.baidu.com/' },// 外部链接
                 ]
             }
         ],
         sidebar: [
-            '/', '/start/', '/base/'
+            '/', '/base/',
+            '/component/', '/unit-test/',
+            '/vue-router/','/communication/',
+            '/vue3/','/vue3-custom-render/'
         ]
     }
 }
