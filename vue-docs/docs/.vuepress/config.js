@@ -17,8 +17,9 @@ module.exports = {
                 text: '学习笔记',
                 items: [
                     { text: 'vue响应式原理', link: '/type/' }, // 可不写后缀 .md
-                    { text: 'vue-router原理', link: 'https://www.baidu.com/' },// 外部链接
-                    { text: 'vuex原理', link: 'https://www.baidu.com/' },// 外部链接
+                    { text: 'vue-router原理', link: 'https://github.com/yunfeiw/vue-core/tree/router%26vuex' },// 外部链接
+                    { text: 'vuex原理', link: 'https://github.com/yunfeiw/vue-core/tree/router%26vuex' },// 外部链接
+                    { text: 'mini-vue', link: 'https://github.com/yunfeiw/vue-core/tree/mini-vue/core' },// 外部链接
                 ]
             }
         ],
@@ -26,7 +27,8 @@ module.exports = {
             '/', '/base/',
             '/component/', '/unit-test/',
             '/vue-router/','/communication/',
-            '/vue3/','/vue3-custom-render/'
+            '/vue3/','/vue3-custom-render/',
+            '/reactive/'
         ]
     }
 }

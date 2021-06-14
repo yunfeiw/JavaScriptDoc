@@ -7,7 +7,7 @@
 - mountElemnt
 - UI(dom)  pc 移动 小程序
 
-![渲染流程](/assets/img/渲染流程.png)
+![渲染流程](/assets/img/xuan-ruan-liu-cheng.png)
 
 ### 自定义 渲染
 ```js
@@ -116,4 +116,72 @@ game.ticker.add(hanlder)
 game,ticker.remove(hanlder)
 
 
+```
+
+实现
+```js
+
+const renderer = createRenderer({
+  createElement(type) {
+    // 容器 以及 图片
+    console.log(type);
+    let element;
+    switch (type) {
+      case "container":
+        element = new Container();
+        break;
+      case "sprite":
+        element = new Sprite();
+        break;
+    }
+
+    return element;
+  },
+
+  insert(el, parent) {
+    if (el) {
+      parent.addChild(el);
+    }
+  },
+  parentNode(node) {
+    // 获取当前 node 的父级节点
+    // parent
+    return node.parent;
+  },
+  remove(el) {
+    // 当删除一个元素的时候 进行调用
+    if (el && el.parent) {
+      // removeChild(el)
+      el.parent.removeChild(el);
+    }
+  },
+  patchProp(el, key, prevValue, nextValue) {
+    // props
+    // console.log("key", key);
+    switch (key) {
+      case "texture":
+        // 给图片 src 的时候
+        el.texture = Texture.from(nextValue);
+        break;
+      case "onClick":
+        // onClick
+        el.on("pointertap", nextValue);
+        break;
+      default:
+        // x y
+        // interactive
+        // el.x = nextValue
+        // el.y = nextValue
+        el[key] = nextValue;
+        break;
+    }
+  },
+  // 必须要的
+  createText(text) {
+    return new Text(text);
+  },
+
+  nextSibling() {},
+  createComment() {},
+});
 ```

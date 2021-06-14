@@ -5,4 +5,4 @@
 Vue 被设计为可以自底向上逐层应用
 ### 渐进式
 
-![渐进式示意图](/assets/img/渐进式示意图.jpg)
+![渐进式示意图](/assets/img/jian-jin-shi-shi-yi-tu.jpg)

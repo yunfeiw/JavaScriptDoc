@@ -3,9 +3,9 @@
 组件树
 ![组件树](/assets/img/vue-components.png)
 
-## 父子组件通信
+## 父子组件间通信
 
-![父子组件通信](/assets/img/父子组件通信.png)
+![fu-zi-zu-jian-tong-xin](/assets/img/fu-zi-zu-jian-tong-xin.png)
 
 ### props emit
 
@@ -124,9 +124,9 @@ export default {
 };
 ```
 
-## 多层级父子组件通信
+## 多层级父子组件间通信
 
-![多层级父子组件通信](/assets/img/多层级父子组件通信1.png)
+![多层级父子组件间通信](/assets/img/duo-ceng-ji-fu-zi-tong-xin1.png)
 
 ### provide inject
 
@@ -244,7 +244,7 @@ export default {
 
 ### attr
 
-![多层级父子组件通信](/assets/img/多层级父子组件通信2.png)
+![多层级父子组件通信](/assets/img/duo-ceng-ji-fu-zi-tong-xin2.png)
 
 条件： 子组件中未定义 `props`;则可以在 `this.$attrs` 中获取到
 
