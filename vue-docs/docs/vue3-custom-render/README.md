@@ -7,7 +7,7 @@
 - mountElemnt
 - UI(dom)  pc 移动 小程序
 
-![渲染流程](/assets/img/xuan-ruan-liu-cheng.png)
+![渲染流程](/assets/img/xuan-ran-liu-cheng.png)
 
 ### 自定义 渲染
 ```js
