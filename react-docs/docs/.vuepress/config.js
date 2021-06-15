@@ -1,6 +1,6 @@
 module.exports = {
-    title: 'yunfei',
-    description: 'ts文档',
+    title: 'react',
+    description: 'react文档',
     // base:'',
     head: [
         ['link', { rel: 'icon', href: '/assets/favicon.ico' }]
@@ -22,22 +22,7 @@ module.exports = {
             }
         ],
         sidebar: [
-            '/', '/start/', '/type/', '/interface/', '/function/', '/class/', '/type2.0/', '/genericParadigm/',
-            {
-                title: '模板系统',   // 必要的
-                path: '/module/',   // 可选的, 标题的跳转链接，应为绝对路径且必须存在
-                collapsable: true, // 可选的, 默认值是 true,
-                sidebarDepth: 1,    // 可选的, 默认值是 1
-                children: [
-                    '/module/AMD/',
-                    '/module/CommonJS/',
-                    '/module/UMD/',
-                    '/module/ESM/',
-                    '/module/TypeScriptModule/',
-                    '/module/moduleFun/',
-                    '/module/spaceName/'
-                ]
-            }, '/ornament/'
+            '/', '/start/', '/component/'
         ]
     }
 }
