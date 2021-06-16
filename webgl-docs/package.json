@@ -1,7 +1,7 @@
 {
-  "name": "webpack-doc",
+  "name": "webgl-doc",
   "version": "1.0.0",
-  "description": "webpack文档",
+  "description": "webgl文档",
   "main": "index.js",
   "license": "MIT",
   "scripts": {

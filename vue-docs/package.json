@@ -1,7 +1,7 @@
 {
-  "name": "type-script-doc",
+  "name": "vue-doc",
   "version": "1.0.0",
-  "description": "ts文档",
+  "description": "vue文档",
   "main": "index.js",
   "license": "MIT",
   "scripts": {

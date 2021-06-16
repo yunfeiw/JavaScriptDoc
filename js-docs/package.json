@@ -1,7 +1,7 @@
 {
-  "name": "webpack-doc",
+  "name": "javascript-doc",
   "version": "1.0.0",
-  "description": "webpack文档",
+  "description": "javascript文档",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
