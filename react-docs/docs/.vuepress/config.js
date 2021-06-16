@@ -16,13 +16,15 @@ module.exports = {
             }, {
                 text: '学习笔记',
                 items: [
-                    { text: '笔记', link: '/type/' }, // 可不写后缀 .md
-                    { text: '其它链接', link: 'https://www.baidu.com/' }// 外部链接
+                    { text: '笔记', link: '/' },
+                    { text: 'react原理', link: 'https://www.baidu.com/' },
+                    { text: 'react-router原理', link: 'https://www.baidu.com/' },
+                    { text: 'redux原理', link: 'https://www.baidu.com/' }
                 ]
             }
         ],
         sidebar: [
-            '/', '/start/', '/component/'
+            '/', '/start/', '/component/', '/skill/', '/hooks/'
         ]
     }
 }

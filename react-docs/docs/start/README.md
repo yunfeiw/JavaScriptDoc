@@ -39,6 +39,14 @@ const p = React.createElement("p", { class: "yunfei" }, "你好");
 
 JSX 是一个基于 JavaScript + XML 的一个扩展语法
 
+### JSX 本质
+
+- 17 之前是 转换 成 createElement 函数
+
+  createElement(type:string,props:{},children:[])
+
+- 17 之后是 直接编译 成 VDOM（虚拟 DOM）
+
 - 作为值使用
 - 不是字符串
 - 不是 HTML

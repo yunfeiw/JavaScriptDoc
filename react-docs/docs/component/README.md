@@ -238,6 +238,26 @@ class Child extends Component {
 }
 ```
 
+ChildConsumer.js
+
+```js
+import { Component } from "react";
+import { Consumer } from "./context.js";
+
+class ChildConsumer extends Component {
+  render() {
+    return (
+      <Consumer>
+        {({ name }) => {
+          // 解构
+          return <div>name:{name}</div>;
+        }}
+      </Consumer>
+    );
+  }
+}
+```
+
 ## 受控组件
 
 当想要获取表单的一些内部状态时，就可以将表单的内部状态和组件的状态进行绑定，这样就形成受控组件

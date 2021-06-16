@@ -1,5 +1,9 @@
 ## hooks
 
+逻辑复用成本
+
+16.7 test
+16.8 正式
 ### 函数组件
 ```js
 function App(props){
