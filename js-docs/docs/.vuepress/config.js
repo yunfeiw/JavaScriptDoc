@@ -1,6 +1,6 @@
 module.exports = {
-    title: 'webgl',
-    description: 'webgl文档',
+    title: 'JavaScript',
+    description: 'javaScript文档',
     // base:'',
     head: [
         ['link', { rel: 'icon', href: '/assets/favicon.ico' }]
@@ -21,9 +21,7 @@ module.exports = {
             }
         ],
         sidebar: [
-            '/', '/1base/', '/2data-interaction/',
-            '/3graphical/', '/4matrix/', '/5compound/',
-            '/6glsles/'
+            '/',
         ]
     }
 }

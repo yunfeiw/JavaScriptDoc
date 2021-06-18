@@ -1,7 +1,7 @@
 {
-  "name": "type-script-doc",
+  "name": "react-doc",
   "version": "1.0.0",
-  "description": "ts文档",
+  "description": "react文档",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
