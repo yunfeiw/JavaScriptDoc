@@ -22,8 +22,8 @@ module.exports = {
             }
         ],
         sidebar: [
-            '/','/1base/','/2data-interaction/',
-            '/3graphical/','/4matrix/','/5compound/',
+            '/', '/1base/', '/2data-interaction/',
+            '/3graphical/', '/4matrix/', '/5compound/',
             '/6glsles/'
         ]
     }
