@@ -1,6 +1,6 @@
 module.exports = {
-    title: 'react',
-    description: 'react文档',
+    title: '数据结构',
+    description: '数据结构文档',
     // base:'',
     head: [
         ['link', { rel: 'icon', href: '/assets/favicon.ico' }]
@@ -17,15 +17,11 @@ module.exports = {
                 text: '学习笔记',
                 items: [
                     { text: '笔记', link: '/' },
-                    { text: 'react原理', link: 'https://www.baidu.com/' },
-                    { text: 'react-router原理', link: 'https://www.baidu.com/' },
-                    { text: 'redux原理', link: 'https://www.baidu.com/' }
                 ]
             }
         ],
         sidebar: [
-            '/', '/start/', '/component/', '/skill/'
-            , '/hooks/', '/redux/'
+            '/','/dfs-bfs/'
         ]
     }
 }

@@ -286,3 +286,105 @@ webgl 绘图需要两种着色器：
 在两个关键帧中间需要做“补间动画”，才能实现图画的运动；插入补间动画后两个关键帧之间的插补帧是由计算机自动运算而得到的。
 
 顶点着色器里的顶点就是补间动画里的关键帧，片元着色器里的片元就是关键帧之间以某种算法算出的插值。当然，咱们 webgl 里的片元是像素的意思。
+
+直线
+
+顶点着色器里的顶点就是决定这一条直线的两个点，片元着色器里的片元就是把直线画到画布上后，这两个点之间构成直线的每个像素。
+
+
+## 着色器语言
+
+webgl 的着色器语言是GLSL ES语言
+
+
+- 顶点着色程序，要写在type=“x-shader/x-vertex” 的script中。
+
+```js
+<script id="vertexShader" type="x-shader/x-vertex">
+    void main() {
+        gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
+        gl_PointSize = 100.0;
+    }
+</script>
+```
+
+- 片元着色程序，要写在type=“x-shader/x-fragment” 的script中。
+```js
+<script id="fragmentShader" type="x-shader/x-fragment">
+    void main() {
+        gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);
+    }
+</script>
+```
+
+void main() {…… } 是主体函数。
+
+顶点着色器中
+
+- gl_Position 是顶点的位置;
+- gl_PointSize 是顶点的尺寸;
+   
+名称都是固定的，不能写成别的。
+
+片元着色器中
+
+- gl_FragColor 是片元的颜色;
+
+vec4()  是一个4维矢量对象。
+
+将vec4() 赋值给顶点点位gl_Position 的时候，其中的前三个参数是x、y、z，第4个参数默认1.0，其含义我们后面会详解；
+
+将vec4() 赋值给片元颜色gl_FragColor 的时候，其中的参数是r,g,b,a。
+
+
+### 着色器初始化  
+
+1. 建立程序对象，目前这只是一个手绘板的外壳。
+
+```js
+const shaderProgram = gl.createProgram();
+```
+
+2. 建立顶点着色器对象和片元着色器对象
+
+   ```js
+   const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+   const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+   ```
+3. 将顶点着色器对象和片元着色器对象装进程序对象中，这就完成的手绘板的拼装。
+
+```js
+   gl.attachShader(shaderProgram, vertexShader);
+   gl.attachShader(shaderProgram, fragmentShader);
+```
+
+4. 连接webgl 上下文对象和程序对象，就像连接触控笔和手绘板一样（触控笔里有传感器，可以向手绘板发送信号）。
+
+```js
+   gl.linkProgram(shaderProgram);
+```
+
+5. 启动程序对象，就像按下了手绘板的启动按钮，使其开始工作。
+```js
+gl.useProgram(program);
+```
+
+上面第二步中的建立着色对象方法loadShader()，是一个自定义的方法，其参数是(webgl上下文对象，着色器类型，着色器源文件)
+
+- gl.VERTEX_SHADER 是顶点着色器类型;
+- gl.FRAGMENT_SHADER是片元着色器类型;
+
+```js
+function loadShader(gl, type, source) {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    return shader;
+}
+```
+- gl.createShader(type) ：根据着色器类型建立着色器对象的方法。
+
+- gl.shaderSource(shader, source)：将着色器源文件传入着色器对象中，这里的着色器源文件就是我们之前在script 里用GLSL ES写的着色程序。
+
+- gl.compileShader(shader)：编译着色器对象。
+

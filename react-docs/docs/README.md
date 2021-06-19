@@ -2,7 +2,8 @@
 
 [官网](https://react.docschina.org/)
 
-用于构建用户界面的 JavaScript 库
+![react](/assets/img/react.png)
+
 
 1. 声明式
    React 使创建交互式 UI 变得轻而易举。为你应用的每一个状态设计简洁的视图，当数据变动时 React 能高效更新并渲染合适的组件。
