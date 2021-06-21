@@ -23,7 +23,7 @@ module.exports = {
         sidebar: [
             '/', '/1base/', '/2data-interaction/',
             '/3graphical/', '/4matrix/', '/5compound/',
-            '/6glsles/'
+            '/6color-texture/','/7glsles/'
         ]
     }
 }
