@@ -25,7 +25,7 @@ module.exports = {
         ],
         sidebar: [
             '/', '/start/', '/component/', '/skill/'
-            , '/hooks/', '/redux/'
+            , '/hooks/', '/react-router/', '/redux/'
         ]
     }
 }
