@@ -21,7 +21,7 @@ module.exports = {
             }
         ],
         sidebar: [
-            '/','/dfs-bfs/'
+            '/','/1linked-list/','/dfs-bfs/'
         ]
     }
 }
