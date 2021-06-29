@@ -418,3 +418,19 @@ class 组件内部 batchUpdate（批处理）,值设置为 false
 主键的一些列更显
 
 ### 组件更新
+
+
+## diff
+
+tree diff
+
+递归向下 同层对比
+
+element diff
+
+1. 对比 type 是否一致 
+2. 对比 文本节点内容 是否一致
+3. 组件 则更新子组件
+4. 如果是元素 对比props并更新 子元素
+
+list diff
