@@ -1,4 +1,4 @@
-### react
+### React
 
 [官网](https://react.docschina.org/)
 
