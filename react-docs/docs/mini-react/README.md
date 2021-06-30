@@ -103,6 +103,9 @@ const reactText = Symbol("react.text");
 function createElement(type, props, ...child) {
   delete props.__self;
   delete props.__source;
+  // 这里的 key 在 diff时使用
+  let key = props.key;
+  delete props.key;
 
   let children = child.flat(Infinity);
   // 处理 string 与 number（react中是在 react-dom处理的）
@@ -119,7 +122,7 @@ function createElement(type, props, ...child) {
       }
     })
     .filter((e) => e);
-  return { $$type: reactElement, type, props, children };
+  return { $$type: reactElement, key, type, props, children };
 }
 ```
 
@@ -611,6 +614,7 @@ function diffNode(oldNode, newNode) {
     // 组件 ？
     if (oldNode.type.isReactComponent) {
       // 更新子组件
+      updateCmp(oldNode, newNode);
     } else {
       // 对比 props
       diffProps(oldNode.props, newNode.props);
@@ -655,6 +659,134 @@ function diffChildren(oldChildren, newChildren) {}
 
 更新组件
 
+更新组件需要拿到当前·组件实例·所以修改 createCmp 方法
+
 ```js
-function updateCmp() {}
+function createCmp(vCmp){
+    let Cmp = new vCmp.type(vCmp.props);
+    ...
+    vCmp.Cmp = Cmp; //记录
+    ...
+}
+```
+
+```js
+function updateCmp(oldNode, newNode) {
+  // 更新组件
+  oldCmp.props = oldCmp.props;
+  return oldCmp.Cmp.updater(newCmp.props,oldCmp.Cmp.state);
+
+}
+```
+
+### diffChildren
+
+该方法较为复杂，因为 children 可能发生 新增、删除、移动等情况
+
+并且 diffChildren(oldChildren, newChildren) 的两个参数值是数组结构
+
+为了便于 diff 将其 转换为 对象结构
+
+提供方法 getKeys
+
+这里的 属性 key 是在 react.createElement 中 Porps 提供的；
+
+```js
+function getKeys(child) {
+  let key = {};
+  child.forEach((item, index) => {
+    let { key } = item;
+    key = key !== undefined ? key : "RC" + index;
+    key = key;
+    keys[key] = item;
+    keys[key].index = index; // 记录 index 便于 对 元素顺序的比对
+  });
+}
+```
+
+> 值得注意的是，在对象 key 为数字时 { 2:2, 1:1, 4:4 },遍历该对像时，打印的结果是 1:1 , 2:2, 4:4;
+> 所以针对 key 数字的对象，打印结果会按照 key 进行排序;
+> 想解决这个问题 要注意 保证不是 数字（ 如： 'w'+1）;
+
+如果 key 是纯数字，则会导致 diff 是 节点 对比顺序发生问题
+
+修改 diffChildren 方法
+
+```js
+function diffChildren(oldChildren, newChildren) {
+  let oldChild = getKeys(oldChildren);
+  let newChild = getKeys(newChildren);
+
+  for (let k in newChild) {
+    if (oldChild[k]) {
+      // 新 旧 节点都存在 进行深层次比对
+      diffNode(oldChild[k], newChild[k]);
+    } else {
+      // 新增 节点
+    }
+  }
+
+  for (let k in oldChild) {
+    if (!newChild[k]) {
+      // 老节点被删除
+    }
+  }
+}
+```
+
+#### 检测 children 顺序改变？
+
+正常情况下， 后一位的索引值，应该不小于前一位的；
+
+如果，元素的位置没有发生改变，那我们拿原生更新的前索引值，去做对比，也应该符合后一位的索引值不小于前一位的索引值
+
+```
+perv: a(0), b(1), c(2), d(3)
+next: b, a, e, d, f, c
+
+声明一个变量，记录上一位的索引值.
+lastIndex = 0;
+
+1. 找到 b ,b 更新前的索引值为 1，符合规则，b 位置没有变化，更新 lastIndex = 1
+2. 找到 a ,a 更新前的索引值为 0，不符合规则，a 的位置变化，
+3. 找到 e ,这是新增节点，跳过 e
+4. 找到 d ,d 更新前的索引值为 3，符合规则，d 位置没有变化，更新 lastIndex = 3
+5. 找到 f ,这是新增节点，跳过 f
+6. 找到 c ,c 更新前的索引值为 2，不符合规则，说明位置有变化
+
+```
+
+依照 此流程 可以将变化的元素搜集出来；如 移动（a,c）、新增（e、f）
+
+修改 diffChildren 的 `if(oldChild[k])`的判断
+
+```js
+function diffChildren(oldChildren, newChildren) {
+  let oldChild = getKeys(oldChildren);
+  let newChild = getKeys(newChildren);
+
+  let lastIndex = 0; // 标识 上一位 索引位置
+
+  for (let k in newChild) {
+    if (oldChild[k]) {
+      // 新 旧 节点都存在 进行深层次比对
+      diffNode(oldChild[k], newChild[k]);
+
+      if (lastIndex > oldChild[k].index) {
+        // 位置发生变化
+      } else {
+        // 位置没有变化
+        lastIndex = oldChild[k].index;
+      }
+    } else {
+      // 新增 节点
+    }
+  }
+
+  for (let k in oldChild) {
+    if (!newChild[k]) {
+      // 老节点被删除
+    }
+  }
+}
 ```
