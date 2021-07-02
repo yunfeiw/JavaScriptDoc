@@ -1,41 +1,64 @@
 ## mini-react
 
-虚拟 DOM ——> diff ——> mounted
+> 注意：因为 react 17 采用实时编译[jsx-vdom],所以本示例仅适合 react 16 及以下版本
 
-`react 16`版本 createElement
+## 前言
 
-babel 将 jsx 转换成 ceateElement 函数，调用输出 vdom
+react 用于生成 vdom；
 
-`react 17` 以下；因为`run-time`是实时编译 jsx - vdom；
+react-dom 将生成的 vdom，渲染对应的界面（如：浏览器、app、桌面端）；
 
-目录结构
+知道两者区别，便于我们实现接下来的操作；
 
-```js
-|—— public
-|—— src
-      react-dom
-      react
-      index
+## react
 
+在开始前我们要知道什么是`JSX`；
 
+JSX 本质上就是个对象，是通过 react.createElement 方法生成的 vdom;
+
+```jsx
+const Foo = <div className="yunfei">Foo</div>;
+
+React.createElement("div", { className: "yunfei" }, "Foo");
 ```
 
-### createElement
+### babel
 
-创建 vdom
+babel 在 react 中的角色是，调用 React.createElement 方法，将`JSX`解析完成后的数据，传递给该方法，生成 vdom
 
-#### 封装 createElement
+### react 中的方法
 
-- type 类型
-- props 属性
-- {...any} children 子节点
+通过 babel 可以，react.js 中需要提供 createElement 方法；
+
+在创建 class 组件时,还需要提供一个继承类 ·Component·;
+
+```js
+import React, { Component } from "react";
+
+class App extends Component {}
+```
+
+综上所述 react 提供了 createElement 方法 与 Component 类；
 
 ```js
 // 标识vdom 类型
 const reactElement = Symbol("react.element");
-
+/**
+- type 类型
+- props 属性
+- {...any} children 子节点
+*/
 function createElement(type, props, ...children) {
   return { $$type: reactElement, type, props, children };
+}
+
+// 类组件
+class Component {
+  constructor(props) {
+    this.props = props;
+  }
+  static isReactComponent = {}; // 区分组件 或者 元素
+  setState(newState) {} // setState 方法
 }
 
 const React = {
@@ -44,7 +67,7 @@ const React = {
 export default React;
 ```
 
-打印 App (jsx——>vdom)
+接下来我们来看下 App 转换成 vnode 后，打印出来的结果
 
 ```js
 // app.js
@@ -58,23 +81,18 @@ console.log(App);
 打印结果
 ![vdom](/assets/img/mini-react/vdom.png)
 
-#### 模板类型处理
+### 复杂的 JSX
 
-- 数组情况
+针对 文本类型 和 数组 的特殊处理，便于之后的 mounted 做好预设
 
-```html
+```js
 <div>
-  hello world {[
-  <p key="1">1</p>
-  ,
-  <p key="2">2</p>
-  ,
-  <p key="3">3</p>
-  , ["a", "b", "c"]]}
+  hello world
+  {[<p key="1">1</p>, <p key="2">2</p>, <p key="3">3</p>, ["a", "b", "c"]]}
 </div>
 ```
 
-修改
+react.js
 
 ```js
 // 标识vdom
@@ -87,7 +105,6 @@ function createElement(type, props, ...child) {
   delete props.__source;
 
   let children = child.flat(Infinity);
-
   // 处理 string 与 number（react中是在 react-dom处理的）
 
   children = children
@@ -104,24 +121,32 @@ function createElement(type, props, ...child) {
     .filter((e) => e);
   return { $$type: reactElement, type, props, children };
 }
-
-const React = {
-  createElement,
-};
-export default React;
 ```
 
-打印结果
+打印下
 
 ![vdoms](/assets/img/mini-react/vdoms.png)
 
+接下来我们看看 react-dom 做了什么
+
 ## React-dom
 
-vdom - transform - rdom
+```js
+import ReactDOM from "react-dom";
+import App from "./app";
+
+ReactDOM.render(App, document.querySelector("#root"));
+```
+
+如上所示 react.dom 提供了 render 方法；接收参数 vnode 和 根节点；
 
 ### 主体结构
 
-render 函数
+参数
+
+- tree vdom
+- container 挂载节点
+- cb 回调函数
 
 ```js
 function render(tree, container, cb) {}
@@ -133,24 +158,22 @@ export default ReactDOM;
 
 ### 创建 dom
 
-#### dom 类型
+根据 vnode 生成相应 节点
+
+节点类型
 
 1. 元素
 2. 文本
 3. 类组件
 
+因为 vnode 是个树形结构，所以采用`递归`方式创建节点
+
 #### 创建元素与文本
 
-- tree vdom
-- container 挂载节点
-- cb 回调函数
-
 ```js
-import { reactText, reactElement } from "./react";
-
 function render(tree, container, cb) {
-  const node = createNode(tree);
-  container.appendChild(node);
+  const node = createNode(tree); // 创建节点
+  container.appendChild(node); // 挂载节点
 }
 
 const ReactDOM = {
@@ -159,14 +182,20 @@ const ReactDOM = {
 export default ReactDOM;
 ```
 
+- createNode
+
+此函数用来创建 元素 [标签|文本] || [<p>|text]
+
+通过 判断 \$\$type 来进行生成对应节点
+
 ```js
-// 创建节点 元素 字符串 组件
+import { reactText, reactElement } from "./react";
+
 function createNode(vnode) {
   let node;
   // 元素
   if (vnode.$$type === reactElement) {
     node = document.createElement(vnode.type);
-
     // 创建子节点
     createChildren(node, vnode.children);
   } else if (vnode.$$type === reactText) {
@@ -175,6 +204,10 @@ function createNode(vnode) {
   return node;
 }
 ```
+
+- createChildren
+
+循环子节点 并 调用 render 函数
 
 ```js
 // 创建子节点 递归回调
@@ -187,10 +220,41 @@ function createChildren(parent, children) {
 
 #### 添加属性 props
 
+```js
+import React from "./mini-react/react";
+import ReactDOM from "./mini-react/react-dom";
+
+const App = (
+  <div>
+    hello world
+    <div
+      style={{
+        width: "200px",
+        height: "200px",
+        border: "2px solid #000",
+      }}
+    ></div>
+    <button
+      onClick={() => {
+        alert(1);
+      }}
+    >
+      点击
+    </button>
+  </div>
+);
+console.log(App);
+ReactDOM.render(App, document.querySelector("#root"));
+```
+
+属性有哪些
+
 - style
 - 事件（react 自己的`合成事件`是·基于观察者模式·实现的）
 
-创建属性
+* createProps
+
+创建属性，通过循环遍历 props 来创建
 
 ```js
 function createProps(node, props) {
@@ -207,6 +271,10 @@ function createProps(node, props) {
   }
 }
 ```
+
+- createNode
+
+更改 createNode 方法，添加 创建 props 函数
 
 ```js
 // 创建节点 元素 字符串 组件
@@ -227,34 +295,11 @@ function createNode(vnode) {
 }
 ```
 
-### class 组件
+### 挂载 class 组件
 
-#### component 组件
+首先打印下 class 组件的 vnode;
 
-react.js 新增 class Component
-
-```js
-// class 组件
-
-class Component {
-  constructor(props) {
-    this.props = props;
-  }
-  static isReactComponent = {}; //区分组件 或者 元素
-  setState(newState) {
-    // 更新流程
-    if (this.isBatchUpdate) {
-      // 批处理 开启 不直接更新组件
-      this.nextStates.push(newState);
-    } else {
-      // 批处理 未开启 直接更新
-      this.updater(this.props, Object.assign({}, this.state, newState));
-    }
-  }
-}
-```
-
-#### class 组件生成的 vdom 结构
+- index.js
 
 ```js
 import React from "./mini-react/react";
@@ -296,17 +341,15 @@ ReactDOM.render(App, document.querySelector("#root"));
 打印出的 class Foo vdom 结构 如下
 ![classvdom](/assets/img/mini-react/classvdom.png)
 
-#### 创建 class 组件
-
-结构以知创建 class 组件
-
-步骤：
+#### 思路
 
 1. 判断是否为 class 组件
 2. 依据 class 的 vdom,生成 真实 dom
 3. 执行组件声明周期
 
 - 判断 class 组件
+
+修改 createNode 函数，依据 class 组件继承`Component`类的`isReactComponent`属性进行判断
 
 ```js
 // 创建节点 元素 字符串 组件
@@ -334,13 +377,13 @@ function createNode(vnode) {
 
 - 依据 class 的 vdom,生成 真实 dom
 
+新增 createCmp 函数
+
 ```js
 // 创建组件
 function createCmp(vCmp) {
   // 实例化 class
-
   let Cmp = new vCmp.type(vCmp.props); //传参 props
-
   // 获取 vdom
   const vnode = Cmp.render();
   // 生成 节点
@@ -351,6 +394,8 @@ function createCmp(vCmp) {
 ```
 
 - 执行组件声明周期
+
+新增 stateFromProps 与 componentDidMount 方发
 
 ```js
 // class 组件 props 映射 到 state
@@ -368,6 +413,8 @@ function didMount(cmp) {
   }
 }
 ```
+
+修改 createCmp 函数
 
 ```js
 // 创建组件
@@ -398,39 +445,216 @@ function createCmp(vCmp) {
 结果
 ![classres](/assets/img/mini-react/classres.png)
 
-#### class 批处理 setState
+### 实现批处理 setState
 
-> setState 的同步异步在于 其使用 方式
+> setState 的同步/异步在于其使用方式
 
 - 在 React 时间，及相关的 React 方法中，是异步
 - 在 setTimeout 等异步方法，或者 DOM 原生事件中是同步
 
-##### 批处理
+> 批处理原理
 
-class 组件的中`react方法`、`react合成事件`调用触发时
+1. 批处理在，组件提供的`方法`、`合成事件`中发生
 
-class 组件内部会记录一个状态 batchUpdate（批处理）,值设置为 true
+2. 发生时，组件内部会记录一个状态值`批处理`（batchUpdate）,默认值为`true`
 
-调用相关 参数
+3. 执行方法（生命周期、事件）
 
-class 组件内部 batchUpdate（批处理）,值设置为 false
+4. 在调用`setState`方法时，判断当前`批处理`是否开启；
 
-主键的一些列更显
+- 开启状态，则将状态值，添加至`状态队列`中
+- 关闭状态，直接更新组件
 
-### 组件更新
+5. 方法执行完成后，`批处理`状态值设置为 `false`
 
+6. 合并`状态队列`中的状态
+
+7. 更新组件
+
+#### 改造 createCmp
+
+```js
+// 创建组件
+function createCmp(vCmp) {
+  // 实例化 class
+
+  let Cmp = new vCmp.type(vCmp.props); //传参 props
+  // 生命周期
+  let nextState = stateFromProps(vCmp, vCmp.props, Cmp.state);
+  // 合并状态
+  if (nextState) {
+    Object.assign(Cmp.state, nextState);
+  }
+  // 获取 vdom
+  const vnode = Cmp.render();
+  // 生成 节点
+  let node = createNode(vnode);
+
+  /** 声明 更新组件函数 */
+  Cmp.updater = (nextProps, nextState) => {
+    // shouldComponentUpdate
+    let prevProps = Cmp.props;
+    let prevState = Cmp.state;
+    Cmp.props = nextProps;
+    Cmp.state = nextState;
+
+    // 生成 新的 vdom
+    let newNode = Cmp.render();
+    console.log(newNode);
+    // diff 操作
+    diff(vnode, newNode);
+  };
+
+  // 组件 mounted (react解决方案 微任务 事件队列)使用 setTimeout 替换
+  setTimeout(() => {
+    // didMount(Cmp)
+    batchUpdate(Cmp, didMount, [Cmp]);
+  });
+
+  return node;
+}
+```
+
+#### 创建 batchUpdate
+
+批处理函数
+
+```js
+// 批处理
+function batchUpdate(Cmp, fn, args, $this) {
+  Cmp.isBatchUpdate = true; // 批处理开启
+  Cmp.nextStates = []; // 任务队列
+  fn.apply($this, args); // 执行
+  Cmp.isBatchUpdate = false; // 批处理关闭
+  // 合并状态值
+  let nextState = Object.assign({}, Cmp.state);
+
+  Cmp.nextStates.forEach((state) => {
+    Object.assign(nextState, state); //合并任务队列中的状态
+  });
+
+  // 更新组件
+  Cmp.updater(Cmp.props, nextState); // 此方法在 创建组件node时 声明
+}
+```
+
+#### 改造 component
+
+设置 setState 方法，实现批处理
+
+```js
+class Component {
+  constructor(props) {
+    this.props = props;
+  }
+  static isReactComponent = {}; // 区分组件或者元素
+  setState(newState) {
+    // 进入更新流程
+    if (this.isBatchUpdate) {
+      //如果当前的批处理状态是打开的，不直接更新组件
+      this.nextStates.push(newState);
+    } else {
+      // 当前批处理流程未打开，直接更新组件
+      this.updater(this.props, Object.assign({}, this.state, newState));
+    }
+  }
+}
+```
 
 ## diff
 
-tree diff
+对比 oldTree 与 newTree;所需对比的类型如下：
 
-递归向下 同层对比
+- tree diff
+- element diff
+- list diff
 
-element diff
+tree diff 遵循策略：
 
-1. 对比 type 是否一致 
+<font color='#662'>同层对比</font>
+
+![tc](/assets/img/mini-react/tc.jpg)
+
+<font color='#662'>递归向下</font>
+
+![kc](/assets/img/mini-react/kc.png)
+
+element diff 对比策略如下：
+
+1. 对比 type 是否一致
 2. 对比 文本节点内容 是否一致
 3. 组件 则更新子组件
-4. 如果是元素 对比props并更新 子元素
+4. 如果是元素 对比 props 并更新 子元素
 
 list diff
+
+### 实现 diff
+
+```js
+function diff(oldTree, newTree) {
+  diffNode(oldTree, newTree);
+}
+```
+
+diff 节点
+
+```js
+function diffNode(oldNode, newNode) {
+  if (oldNode.type !== newNode.type) {
+    // 判断类型 - 不同替换
+  } else if (oldNode.$$type === reactText) {
+    // 判断文本 - 不同替换
+    if (oldNode.inner !== newNode.inner) {
+      // 更新文本内容
+    }
+  } else if (oldNode.$$type === reactElement) {
+    // 组件 ？
+    if (oldNode.type.isReactComponent) {
+      // 更新子组件
+    } else {
+      // 对比 props
+      diffProps(oldNode.props, newNode.props);
+      // 递归子级
+      diffChildren(oldNode.children, newNode.children);
+    }
+  } else {
+    console.error("diff异常！");
+  }
+}
+```
+
+diff 属性
+
+```js
+function diffProps(oldProps = {}, newProps = {}) {
+  for (let k in nextProps) {
+    if (typeof nextProps[k] === "object") {
+      diffProps(oldProps[k], nextProps[k]);
+    } else if (k in oldProps) {
+      if (oldProps[k] !== nextProps[k]) {
+        console.log(k, "属性值有变化");
+      }
+    } else {
+      console.log(k, "新增属性");
+    }
+  }
+
+  for (let k in oldProps) {
+    if (!(k in newProps)) {
+      console.log(k, "删除属性");
+    }
+  }
+}
+```
+
+diff 子组件
+
+```js
+function diffChildren(oldChildren, newChildren) {}
+```
+
+更新组件
+
+```js
+function updateCmp() {}
+```
