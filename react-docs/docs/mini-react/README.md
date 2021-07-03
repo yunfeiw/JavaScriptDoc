@@ -537,9 +537,9 @@ function batchUpdate(Cmp, fn, args, $this) {
   });
 
   // 有变化时更新
-  if(nextState.length>0){
-      // 更新组件 
-      Cmp.updater(Cmp.props, nextState);  // 此方法在 创建组件node时 声明
+  if (nextState.length > 0) {
+    // 更新组件
+    Cmp.updater(Cmp.props, nextState); // 此方法在 创建组件node时 声明
   }
 }
 ```
@@ -593,6 +593,11 @@ element diff 对比策略如下：
 4. 如果是元素 对比 props 并更新 子元素
 
 list diff
+
+1.  将 数组，转换为以 key 作为属性名的对象
+2.  通过循环 newChildren 找到，新增项
+3.  通过循环 oldChildren 找到，删除项
+4.  在其他中，继续递归节点对比，同时，通过索引值的策略找到 位置差异项
 
 ### 实现 diff
 
@@ -677,8 +682,7 @@ function createCmp(vCmp){
 function updateCmp(oldNode, newNode) {
   // 更新组件
   oldCmp.props = oldCmp.props;
-  return oldCmp.Cmp.updater(newCmp.props,oldCmp.Cmp.state);
-
+  return oldCmp.Cmp.updater(newCmp.props, oldCmp.Cmp.state);
 }
 ```
 
@@ -797,54 +801,463 @@ function diffChildren(oldChildren, newChildren) {
 测试
 
 index.js
+
 ```js
 class Foo extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
-      name: 'wang'
-    }
+      name: "wang",
+    };
   }
   componentDidMount() {
-    console.log('挂载完成')
-    this.setState({name:'yunfei'})
+    console.log("挂载完成");
+    this.setState({ name: "yunfei" });
   }
   render() {
     const { name } = this.state;
-    return (<div className={name}>
-      Foo：{name}
-      <button onClick={()=>{this.setState({name : name + Date.now()})}}>add</button>
-    </div>)
+    return (
+      <div className={name}>
+        Foo：{name}
+        <button
+          onClick={() => {
+            this.setState({ name: name + Date.now() });
+          }}
+        >
+          add
+        </button>
+      </div>
+    );
   }
 }
 ```
+
 ![props-class](/assets/img/mini-react/props-class.png)
 
-> 注意  onClick 返回的是函数 而函数每次返回值都是不同的(增加性能消耗)；所以在使用时尽量将其封装到类或者方法中去
+> 注意 onClick 返回的是函数 而函数每次返回值都是不同的(增加性能消耗)；所以在使用时尽量将其封装到类或者方法中去
 
 改进
 
 ```js
 class Foo extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
-      name: 'wang'
-    }
+      name: "wang",
+    };
   }
   componentDidMount() {
-    console.log('挂载完成')
-    this.setState({name:'yunfei'})
+    console.log("挂载完成");
+    this.setState({ name: "yunfei" });
   }
-  setName = ()=>{
-    this.setState({name : name + Date.now()})
-  }
+  setName = () => {
+    this.setState({ name: name + Date.now() });
+  };
   render() {
     const { name } = this.state;
-    return (<div className={name}>
-      Foo：{name}
-      <button onClick={this.setName}>add</button>
-    </div>)
+    return (
+      <div className={name}>
+        Foo：{name}
+        <button onClick={this.setName}>add</button>
+      </div>
+    );
   }
+}
+```
+
+写到这里，diff 的更新就结束了。接下来就 `更新节点`的过程
+
+## patch
+
+1. 类型不一致 replace
+
+- parent.replaceChild(node,oldNode) ; 注意 parent 为父节点 node 被插入节点 oldNode 为插入节点
+
+2. 更新文本内容 text
+
+- node.textContent = '新内容'
+
+3. 属性变化 props
+
+- node
+
+4. 节点位置变化 move
+
+-
+
+5. 新增项 insert
+
+- parent.insertBefore(node,nextSibling)
+
+6. 删除节点 remove
+
+- node.remove()
+
+### 创建差异收集器 patchs
+
+parent.replaceChild(node,oldNode)；
+
+依据方法 replaceChild 可知 需要取得 父节点，所以改造 createNode 方法 将当前 vNode 创建属性（dom）用于挂载真实节点
+
+```js
+// 创建节点 元素 字符串 组件
+function createNode(vnode) {
+    let node;
+    ...
+    vnode.dom = node; //挂载真实节点
+    return node
+}
+```
+
+定义 patches 用于 收集 对应的操作
+
+```js
+function diff(oldTree, newTree, createNode) {
+  diffNode(oldTree, newTree, createNode);
+}
+
+// diff节点
+function diffNode(oldNode, newNode, createNode) {
+  const patches = [];
+  let node = oldNode.dom;
+  const parent = node.parentNode;
+
+  if (oldNode.type !== newNode.type) {
+    // 判断类型 - 不同替换
+    patches.push({
+      type: "replace",
+      parent,
+      oldNode: node,
+      node: createNode(newNode),
+    });
+  } else if (oldNode.$$type === reactText) {
+    // 判断文本 - 不同替换
+    if (oldNode.inner !== newNode.inner) {
+      // 更新文本内容
+      patches.push({
+        type: "text",
+        node,
+        inner: newNode.inner,
+      });
+    }
+  } else if (oldNode.$$type === reactElement) {
+    // 组件 ？
+    if (oldNode.type.isReactComponent) {
+      // 更新子组件
+      updateCmp(oldNode, newNode);
+    } else {
+      // 对比 props
+      const propsPatches = diffProps(oldNode.props, newNode.props);
+      if (Object.keys(propsPatches).length > 0) {
+        patches.push({
+          type: "props",
+          node,
+          props: propsPatches,
+        });
+      }
+      // 递归子级
+      diffChildren(oldNode.children, newNode.children, createNode);
+    }
+  } else {
+    console.error("diff异常！");
+  }
+
+  // 最后
+
+  if (patches.length > 0) {
+    patch(patches); // 开始更新dom
+  }
+}
+```
+
+diffProps 的修改
+
+```js
+// diff属性
+function diffProps(oldProps = {}, newProps = {}) {
+  let propsPatches = {};
+
+  for (let k in newProps) {
+    if (typeof newProps[k] === "object") {
+      let subPatches = diffProps(oldProps[k], newProps[k]); //接收 递归
+      if (Object.keys(subPatches).length > 0) {
+        propsPatches[k] = subPatches;
+      }
+    } else if (k in oldProps) {
+      if (oldProps[k] !== newProps[k]) {
+        console.log(k, "属性值有变化");
+
+        propsPatches[k] = newProps[k];
+      }
+    } else {
+      console.log(k, "新增属性");
+      propsPatches[k] = newProps[k];
+    }
+  }
+
+  for (let k in oldProps) {
+    if (!(k in newProps)) {
+      console.log(k, "删除属性");
+      propsPatches[k] = "react-remove"; // 删除标识
+    }
+  }
+  return propsPatches;
+}
+```
+
+patch.js 的实现
+
+```js
+function patch(patches) {
+  patches.forEach((p) => {
+    switch (p.type) {
+      case "replace":
+        p.parent.replaceChild(p.node, p.oldNode);
+        break;
+      case "text":
+        p.node.textContent = p.inner;
+        break;
+      case "props":
+        patchProps(p.node, p.props);
+        break;
+      case "move":
+      case "insert":
+        p.parent.insertBefore(p.node, p.next);
+        break;
+      case "remove":
+        p.node.remove();
+        break;
+    }
+  });
+}
+
+function patchProps(node, props) {
+  for (let s in props) {
+    if (props[s] === "react-remove") {
+      // 需要判断如果是 DOM 属性，使用removeAttribute，否则 delete node[s]
+      delete node[s];
+    } else if (s === "style") {
+      for (let styl in props["style"]) {
+        node["style"][styl] = props["style"][styl];
+      }
+    } else if (s.slice(0, 2) === "on") {
+      node[s.toLocaleLowerCase()] = props[s];
+    } else {
+      node[s] = props[s];
+    }
+  }
+}
+export default patch;
+```
+
+接下来要 处理 diffChildren
+
+如何获取 next
+
+```js
+let prevChild = [a, b, c, d];
+let nextChild = [b, a(move), e(insert), d, c];
+
+let prev = index - 1;
+let next = prev.nextElementSibling;
+
+// [a,b,c,d]
+// a: 获取前一位 b，然后获取b在dom中的下一位：c，将a插入到c之前
+// [b,a,c,d]
+// e: 获取前一位 a，然后获取a在dom中的下一位：c，将e插入到c之前
+// [b,a,e,c,d]
+// d: 位置不变
+// [b,a,e,c,d]
+// c: 获取前一位 d，然后获取d在dom中的下一位：undefined，将c插入到undefined之前
+// [b,a,e,d,c]
+```
+
+通过该思路 我们就可以实现 节点的`位移`、`新增`
+
+修改 diffChildren
+
+```js
+// diff子组件
+// 触发情况 新增 删除 移动
+// 对比优化 将数组 装换成 对象来进行对比 {k:{},v:{}}
+function diffChildren(oldChildren, newChildren, createNode, parent) {
+  // console.log(oldChildren, newChildren)  // 两个数组 不易于对比
+
+  let oldChild = getKeys(oldChildren);
+  let newChild = getKeys(newChildren);
+  let lastIndex = 0; // 标识 上一位 索引位置
+
+  let patches = [];
+  let nextChildren = newChildren;
+
+  for (let k in newChild) {
+    if (oldChild[k]) {
+      // 新 旧 节点都存在 进行深层次比对
+      nextChildren[newChild[k].index] = diffNode(
+        oldChild[k],
+        newChild[k],
+        createNode
+      );
+
+      if (lastIndex > oldChild[k].index) {
+        // 位置发生变化
+
+        // 获取上一节点
+        let prev =
+          newChild[k].index > 0 ? newChildren[newChild[k].index - 1].dom : null;
+        // 获取下一个节点
+        let next = prev ? prev.nextElementSibling : parent.children[0];
+
+        patches.push({
+          type: "move",
+          parent,
+          node: oldChild[k].dom,
+          next,
+        });
+      } else {
+        // 位置没有变化
+        lastIndex = oldChild[k].index;
+      }
+    } else {
+      // 新增 节点
+      //console.log(newChild[k],"新增项");
+      let prev =
+        newChild[k].index > 0 ? newChildren[newChild[k].index - 1].dom : null;
+      let next = prev ? prev.nextElementSibling : parent.children[0];
+      patches.push({
+        type: "insert",
+        parent,
+        node: createNode(newChild[k]),
+        next,
+      });
+      nextChildren[newChild[k].index] = newChild[k];
+    }
+  }
+
+  for (let k in oldChild) {
+    if (!newChild[k]) {
+      // 老节点被删除
+      console.log(oldChild[k], "被删除了");
+      patches.push({
+        type: "remove",
+        node: oldChild[k].dom,
+      });
+    }
+  }
+
+  if (patches.length > 0) {
+    patch(patches);
+  }
+  return nextChildren;
+}
+```
+
+
+最要保证 vnode的实时性，要在diff之后产生的newVNode 赋值给 oldVNode;
+
+react-dom.js
+```js
+
+// 创建组件
+function createCmp(vCmp) {
+    let Cmp = new vCmp.type(vCmp.props);
+    // 生命周期
+    let nextState = stateFromProps(vCmp, vCmp.props, Cmp.state);
+    if (nextState) {
+        Object.assign(Cmp.state || {}, nextState);
+    }
+    let vnode = Cmp.render();
+    let node = createNode(vnode);
+    //更新组件
+    vCmp.Cmp = Cmp;
+    Cmp.updater = (nextProps, nextState) => {
+        //Object.assign(nextState,stateFromProps(vCmp,nextProps,nextState));
+        // SCU
+        let prevProps = Cmp.props;
+        let prevState = Cmp.state;
+        Cmp.props = nextProps;
+        Cmp.state = nextState;
+
+        //调用 render 生成新的 虚拟DOM；
+        let newVNode = Cmp.render();
+        // getSnapshotBeforeUpdate 
+        vnode = diff(vnode, newVNode, createNode);
+        return vCmp;
+    };
+    setTimeout(() => {
+        batchUpdate(Cmp, didMount, [Cmp]);
+    })
+    return node;
+}
+```
+
+diff.js
+```js
+
+function diff(oldTree, newTree, createNode) {
+    return diffNode(oldTree, newTree,createNode) //返回 newVNode
+}
+
+// diff节点
+function diffNode(oldNode, newNode, createNode) {
+
+    const patches = [];
+    let node = oldNode.dom;
+    let parent = node.parentNode;
+
+    let nextNode = oldNode; //返回nextNode
+
+    if (oldNode.type !== newNode.type) {
+        // 判断类型 - 不同替换
+        patches.push({
+            type: 'replace',
+            parent,
+            oldNode: node,
+            node: createNode(newNode)
+        })
+        nextNode = newNode;
+
+    } else if (oldNode.$$type === reactText) {
+        // 判断文本 - 不同替换
+        if (oldNode.inner !== newNode.inner) {
+            // 更新文本内容
+            patches.push({
+                type: 'text',
+                node,
+                inner: newNode.inner
+            })
+
+            nextNode.inner = newNode.inner;
+
+        }
+    } else if (oldNode.$$type === reactElement) {
+        // 组件 ？
+        if (oldNode.type.isReactComponent) {
+            // 更新子组件
+            nextNode = updateCmp(oldNode, newNode);
+        } else {
+            // 对比 props
+            let propsPatches =  diffProps(oldNode.props, newNode.props);
+            if (Object.keys(propsPatches).length > 0) {
+                patches.push({
+                    type: 'props',
+                    node,
+                    props: propsPatches
+                })
+                nextNode.props = newNode.props;
+            }
+            // 递归子级
+            nextNode.children = diffChildren(oldNode.children, newNode.children,createNode,node)
+        }
+    } else {
+        console.error('diff异常！')
+    }
+
+    // 最后 
+
+    if (patches.length > 0) {
+        patch(patches); // 开始更新dom
+    }
+    return nextNode;
 }
 ```

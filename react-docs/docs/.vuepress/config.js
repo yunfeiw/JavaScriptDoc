@@ -17,7 +17,7 @@ module.exports = {
                 text: '学习笔记',
                 items: [
                     { text: '笔记', link: '/' },
-                    { text: 'react原理', link: 'https://www.baidu.com/' },
+                    { text: 'mini-react项目地址', link: 'https://github.com/yunfeiw/react/tree/mini-react' },
                     { text: 'react-router原理', link: 'https://www.baidu.com/' },
                     { text: 'redux原理', link: 'https://www.baidu.com/' }
                 ]
@@ -26,7 +26,7 @@ module.exports = {
         sidebar: [
             '/', '/start/', '/component/', '/skill/'
             , '/hooks/', '/react-router/', '/redux/'
-            ,'/react-skill/','/mini-react/'
+            ,'/react-skill/','/mini-react/','/dva-umi/'
         ]
     }
 }
