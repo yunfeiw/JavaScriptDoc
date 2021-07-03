@@ -536,8 +536,11 @@ function batchUpdate(Cmp, fn, args, $this) {
     Object.assign(nextState, state); //合并任务队列中的状态
   });
 
-  // 更新组件
-  Cmp.updater(Cmp.props, nextState); // 此方法在 创建组件node时 声明
+  // 有变化时更新
+  if(nextState.length>0){
+      // 更新组件 
+      Cmp.updater(Cmp.props, nextState);  // 此方法在 创建组件node时 声明
+  }
 }
 ```
 
@@ -693,7 +696,7 @@ function updateCmp(oldNode, newNode) {
 
 ```js
 function getKeys(child) {
-  let key = {};
+  let keys = {};
   child.forEach((item, index) => {
     let { key } = item;
     key = key !== undefined ? key : "RC" + index;
@@ -738,7 +741,7 @@ function diffChildren(oldChildren, newChildren) {
 
 正常情况下， 后一位的索引值，应该不小于前一位的；
 
-如果，元素的位置没有发生改变，那我们拿原生更新的前索引值，去做对比，也应该符合后一位的索引值不小于前一位的索引值
+如果，元素的位置没有发生改变，那我们拿元素更新的前索引值，去做对比，也应该符合后一位的索引值不小于前一位的索引值
 
 ```
 perv: a(0), b(1), c(2), d(3)
@@ -787,6 +790,61 @@ function diffChildren(oldChildren, newChildren) {
     if (!newChild[k]) {
       // 老节点被删除
     }
+  }
+}
+```
+
+测试
+
+index.js
+```js
+class Foo extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      name: 'wang'
+    }
+  }
+  componentDidMount() {
+    console.log('挂载完成')
+    this.setState({name:'yunfei'})
+  }
+  render() {
+    const { name } = this.state;
+    return (<div className={name}>
+      Foo：{name}
+      <button onClick={()=>{this.setState({name : name + Date.now()})}}>add</button>
+    </div>)
+  }
+}
+```
+![props-class](/assets/img/mini-react/props-class.png)
+
+> 注意  onClick 返回的是函数 而函数每次返回值都是不同的(增加性能消耗)；所以在使用时尽量将其封装到类或者方法中去
+
+改进
+
+```js
+class Foo extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      name: 'wang'
+    }
+  }
+  componentDidMount() {
+    console.log('挂载完成')
+    this.setState({name:'yunfei'})
+  }
+  setName = ()=>{
+    this.setState({name : name + Date.now()})
+  }
+  render() {
+    const { name } = this.state;
+    return (<div className={name}>
+      Foo：{name}
+      <button onClick={this.setName}>add</button>
+    </div>)
   }
 }
 ```
