@@ -1,3 +1,3 @@
 ### 开始
 
-![数据结构](/assets/img/home.jpg)
+![移动端](/assets/img/home.jpg)

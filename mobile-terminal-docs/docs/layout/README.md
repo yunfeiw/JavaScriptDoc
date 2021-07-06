@@ -376,6 +376,40 @@ align-content: stretch | flex-start | flex-end | center | space-between | space-
 /*针对多行子项们相对于flex容器在垂直方向上的对齐方式*/
 
 ```
+
+缩写 flex
+
+
+#### flex-grow 搜收缩
+
+```html
+<style>
+ul{
+  width:500px;
+  display:flex;
+  flex-direction:row;
+}
+li:nth-child(3){
+  flex-grow:0;
+}
+</style>
+<ul>
+  <li>1</li>
+  <li>2</li>
+  <li>3</li>
+  <li>4</li>
+  <li>5</li>
+  <li>5</li>
+</ul>
+```
+
+
+  
+### 子元素
+
+order 用于调整子项的排列顺序，值 越大  排序位置越靠后；
+
+align-self:baseline 兼容性不好
 ## 扩展
 
 UI 工具
@@ -399,3 +433,5 @@ UI 工具
   color: var(--Colors);
 }
 ````
+### 圣杯布局
+
