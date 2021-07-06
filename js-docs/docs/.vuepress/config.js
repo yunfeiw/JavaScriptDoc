@@ -1,7 +1,6 @@
 module.exports = {
     title: 'JavaScript',
     description: 'javaScript文档',
-    // base:'',
     head: [
         ['link', { rel: 'icon', href: '/assets/favicon.ico' }]
     ],
@@ -21,7 +20,7 @@ module.exports = {
             }
         ],
         sidebar: [
-            '/',
+            '/', '/es/','/class/'
         ]
     }
 }
