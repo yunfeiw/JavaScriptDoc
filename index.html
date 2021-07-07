@@ -1,21 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Title</title>
-      <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1">
-      <style>
-        .box{
-          width: 200px;
-          height: 1px;
-          background: #0a3b98;
-          /* transform: scale(1,0.333333); */
-          font-size: 4px;
-        }
-      </style>
-    </head>
-    <body>
-        <div class="box">爱回收丢</div>
-    </body>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    #box {
+      width: 100vw;
+    }
+
+    ul {
+      display: flex;
+    }
+
+    li {
+      list-style: none;
+      height: 100px;
+    }
+
+    li:nth-child(1) {
+      width: 500px;
+      background: red;
+    }
+
+    li:nth-child(2) {
+      width: 200px;
+      background: blue;
+    }
+
+    li:nth-child(3) {
+      width: 700px;
+      background: yellow;
+    }
+
+    li:nth-child(4) {
+      width: 1000px;
+      background: gray;
+    }
+  </style>
+</head>
+
+<body>
+  <div id='box'>
+    <ul>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+    </ul>
+  </div>
+</body>
 
 </html>
