@@ -1,4 +1,4 @@
-## class
+## 对象与类
 
 ES6 提供了更接近传统语言的写法，引入了 Class（类）这个概念，作为对象的模板。通过 class 关键字，可以定义类。
 
@@ -230,7 +230,7 @@ JavaScript 中的对象有一个特殊的 [[Prototype]] 内置属性，其实就
 
 所有普通的 [[Prototype]] 链最终都会指向内置的 Object.prototype
 
-## call/apply/bind
+## call、apply、bind
 
 作用：改变函数的作用域。
 
@@ -258,21 +258,73 @@ apply 接收两个参数，第二个参数为数组;
 
 bind 返回一个新函数，该函数的 this 指向绑定的作用域 1
 
-### call
+### call 实现
 
 ```js
+Function.prototype.myCall = function(...arg) {
+  const obj = arg.splice(0, 1)[0];
+  obj._fn_ = this;
+  obj._fn_(...arg);
+  delete obj._fn_;
+};
 
-
+function yunfei(name) {
+  console.log(name, this.age);
+}
+var obj = {
+  age: 18,
+};
 ```
 
-### apply
+### apply 实现
 
 ```js
+Function.prototype.myApply = function(...arg) {
+  const obj = arg.splice(0, 1)[0];
+  const args = arg[0];
+
+  obj._fn_ = this;
+  obj._fn_(...args);
+  delete obj._fn_;
+};
+
+var obj = {
+  age: 18,
+};
+
+yunfei.myApply(obj, ["云飞"]);
 ```
 
-### bind
+### bind 实现
 
 ```js
+function yunfei(name) {
+  console.log(name, this.age);
+}
+
+Function.prototype.myApply = function(...arg) {
+  const obj = arg.splice(0, 1)[0];
+  const args = arg[0];
+
+  obj._fn_ = this;
+  obj._fn_(...args);
+  delete obj._fn_;
+};
+
+Function.prototype.myBind = function(...arg) {
+  const obj = arg.splice(0, 1)[0];
+  const args = arg[0] || [];
+
+  return (...some) => {
+    this.myApply(obj, [...args, ...some]);
+  };
+};
+
+var obj = {
+  age: 18,
+};
+
+yunfei.myBind(obj)("yunfei");
 ```
 
 ## 深拷贝

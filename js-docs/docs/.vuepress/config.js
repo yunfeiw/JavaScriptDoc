@@ -20,7 +20,7 @@ module.exports = {
             }
         ],
         sidebar: [
-            '/', '/es/','/class/'
+            '/', '/es/','/class/','/design-pattern/'
         ]
     }
 }
