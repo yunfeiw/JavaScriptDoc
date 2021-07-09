@@ -10,30 +10,79 @@
 
 <body>
   <script>
-    // 父类
-    function Super() {
-      this.val = 'O(∩_∩)O哈哈~';
-    }
-    Super.prototype.getVal = function () {
-      console.log(this.val)
+    class YfPromise {
+      constructor(handle) {
+        this["[[PromiseState]]"] = "pending";
+        this["[[PromiseResult]]"] = undefined;
+
+        // then任务对列
+        this.resolveQueue = [];
+        this.rejectQueue = [];
+
+        // 执行函数 handle
+        handle(this.#resolve.bind(this), this.#reject.bind(this));
+      }
+
+      #resolve(val) {
+        this["[[PromiseState]]"] = "fulfilled";
+        this["[[PromiseResult]]"] = val;
+
+        // 执行的位置 迁移到 这里
+        const run = () => {
+          let cb;
+          while (cb = this.resolveQueue.shift()) {
+            cb && cb(val);
+          }
+        };
+        setTimeout(run)
+      }
+
+      #reject(err) {
+        this["[[PromiseState]]"] = "rejected";
+        this["[[PromiseResult]]"] = err;
+
+        // 执行的位置 迁移到 这里
+        const run = () => {
+          // this.rejectFn(err);
+          let cb;
+          while ((cb = this.rejectQueue.shift())) {
+            cb && cb(err);
+          }
+        };
+        setTimeout(run)
+      }
+
+      then(onResolved, onRejected) {
+        //   返回一个 YfPromise 来支持 then
+        return new YfPromise((reslove, reject) => {
+          // 封装 onResolved onRejected
+
+          // 成功
+          let resolveFn = (val) => {
+            let res = onResolved && onResolved(val);
+            reslove(res); // 返回用于下一个then使用
+          };
+          this.resolveQueue.push(resolveFn);
+          // 失败
+          let rejectFn = (err) => {
+            onRejected && onRejected(val);
+            reject(err); // 返回用于下一个then使用
+          };
+          this.rejectQueue.push(resolveFn);
+        });
+      }
     }
 
-    // 子类
-    function Sub() {
-      this.name = '嘻嘻嘻'
-    }
-    // 子类继承父类
-    Sub.prototype = new Super();
-    // 子类添加方法
-
-    Sub.prototype.getName = function () {
-      console.log(this.name)
-    }
-
-    var yunfei = new Sub();
-
-    console.log(yunfei)
-    console.log(Sub.prototype)
+    const wang = new YfPromise((res) => {
+      setTimeout(()=>{
+        res('yunfei')
+      },2000)
+    }).then((res) => {
+      console.log(res)
+      return 'wang'
+    }).then(res => {
+      console.log(res)
+    })
   </script>
 </body>
 
