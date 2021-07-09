@@ -396,9 +396,166 @@ target 是`被观察者`，listener 是观察者
 - fire() 触发事件，通知所有观察者
 
 ```js
+function Subject() {
+  this.observers = [];
+}
+Subject.prototype = {
+  // 订阅
+  subscribe: function(observer) {
+    this.observers.push(observer);
+  },
+  // 取消订阅
+  unsubscribe: function(observerToRemove) {
+    this.observers = this.observers.filter((observer) => {
+      return observer !== observerToRemove;
+    });
+  },
+  // 触发事件
+  fire: function() {
+    this.observers.forEach((observer) => {
+      observer.call();
+    });
+  },
+};
 
+const subject = new Subject();
+
+function observer1() {
+  console.log("Observer 1 Firing!");
+}
+
+function observer2() {
+  console.log("Observer 2 Firing!");
+}
+
+subject.subscribe(observer1);
+subject.subscribe(observer2);
+subject.fire();
+
+// Observer 1 Firing!
+// Observer 2 Firing!
 ```
 
 ### 中介者模式
 
+![中介者模式](/assets/img/design-pattern/zhongjiezhe.png)
+
+中介者包装了对象（方法）间的相互作用方式，使得这些对象不必直接相互作用。而是真接着协调他们之间的交互，从而使他们可以松散耦合；
+
+当某些对象发生改变后，不会直接作用到相应的对象中；
+
+中介者模式与观察者模式有一定的相似性，都是 一对多 的关系，都是集中式通信，不同点是中介者模式处理`同级`对象间的交互，而观察者模式是处理 observer 和 subject 之间的交互。
+
+#### 应用场景
+
+聊天室，聊天室中的人之间是不能直接对话的，而是通过聊天室这一媒介进行转发的。
+
+#### 实现
+
+```js
+// 成员类型
+function Member(name) {
+  this.name = name;
+  this.chatroom = null;
+}
+Meber.prototype = {
+  // 发送消息
+  send: function(message, toMember) {
+    this.chatroom.send(messgae, this, toMember);
+  },
+  // 接收消息
+  receive: function(message, fromMember) {
+    console.log(`${fromMember.name} to ${this.name}:${message}`);
+  },
+};
+```
+
+```js
+// 聊天室
+function Chatroom(){
+  this.members={};
+}
+Chatroom.prototype={
+  // 添加成员
+  addMember:function(member){
+    this.members[meber.name] = meber;
+    member.chatroom = this;
+  }
+  // 发消息
+  send:function(messgae,fromMember,tomember){
+    tomember.receive(message,fromMember)
+  }
+}
+
+
+```
+
+```js
+// 测试
+const chatroom = new Chatroom();
+const bruce = new Member("bruce");
+const frank = new Member("frank");
+
+chatroom.addMember(bruce);
+chatroom.addMember(frank);
+
+bruce.send("Hey frank", frank);
+```
+
+> 得益于中介者模式，Member 不需要处理和聊天相关的复杂逻辑，而是全部交给 Chatroom，有效的实现了关注分离。
+
 ### 访问者模式
+
+![访问者模式](/assets/img/design-pattern/fangwen.png)
+
+嗯，访问者模式可以让我们在不改变对象本身的情况下，给对象增加新的逻辑，新的逻辑保存在一个独立的访问者对象中。
+
+#### 应用场景
+
+用于扩展第三方的库和库，比如 jq 的 \$.extend
+
+#### 实现
+
+- Visitor Object：访问者对象，拥有一个 visit() 方法
+
+- Receiving Object：接收对象，拥有一个 accept() 方法
+
+- visit(receivingObj)：用于 Visitor 接收一个 Receiving Object
+
+- accept(visitor)：用于 Receving Object 接收一个 Visitor，并通过调用 Visitor 的 visit() 为其提供获取 Receiving Object 数据的能力
+
+```js
+function Employee(name,salary){
+  this.name = name;
+  this.salary = salary;
+}
+
+Employee.prototype = {
+  getSalary: function () {
+    return this.salary;
+  },
+  setSalary: function (salary) {
+    this.salary = salary;
+  },
+  accept: function (visitor) {
+    visitor.visit(this);
+  }
+}
+
+function Visitor() { }
+
+Visitor.prototype = {
+  visit: function (employee) {
+    employee.setSalary(employee.getSalary() * 2);
+  }
+}
+
+const employee = new Employee('云飞', 1000);
+const visitor = new Visitor();
+employee.accept(visitor);
+
+console.log(employee.getSalary());
+
+```
+
+简单来讲，被改变的对象需要对外暴漏一个方法；我们写的扩展对象中要提供下这个方法的具体实现
