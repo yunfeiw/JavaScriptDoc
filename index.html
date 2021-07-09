@@ -10,44 +10,30 @@
 
 <body>
   <script>
-    Function.prototype.myCall = function (...arg) {
-      const obj = arg.splice(0, 1)[0];
-      obj._fn_ = this;
-      obj._fn_(...arg)
-      delete obj._fn_;
+    // 父类
+    function Super() {
+      this.val = 'O(∩_∩)O哈哈~';
+    }
+    Super.prototype.getVal = function () {
+      console.log(this.val)
     }
 
-    function yunfei(name) {
-      console.log(name, this.age)
+    // 子类
+    function Sub() {
+      this.name = '嘻嘻嘻'
+    }
+    // 子类继承父类
+    Sub.prototype = new Super();
+    // 子类添加方法
+
+    Sub.prototype.getName = function () {
+      console.log(this.name)
     }
 
+    var yunfei = new Sub();
 
-    Function.prototype.myApply = function (...arg) {
-      const obj = arg.splice(0, 1)[0];
-      const args = arg[0];
-
-      obj._fn_ = this;
-      obj._fn_(...args)
-      delete obj._fn_;
-    }
-
-    Function.prototype.myBind = function (...arg) {
-      const obj = arg.splice(0, 1)[0];
-      const args = arg[0]||[];
-
-      return (...some)=>{
-        this.myApply(obj,[...args,...some])
-      }
-
-     
-    }
-
-
-    var obj = {
-      age: 18
-    }
-
-    yunfei.myBind(obj)('yunfei')
+    console.log(yunfei)
+    console.log(Sub.prototype)
   </script>
 </body>
 
