@@ -1,0 +1,14 @@
+{
+  "name": "css-doc",
+  "version": "1.0.0",
+  "description": "css",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
+  },
+  "dependencies": {
+    "vuepress": "^1.8.2"
+  }
+}

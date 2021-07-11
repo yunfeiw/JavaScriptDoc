@@ -1,6 +1,7 @@
 module.exports = {
-    title: 'JavaScript',
-    description: 'javaScript文档',
+    title: 'css',
+    description: 'css文档',
+    // base:'',
     head: [
         ['link', { rel: 'icon', href: '/assets/favicon.ico' }]
     ],
@@ -13,14 +14,13 @@ module.exports = {
                 text: '概述',
                 link: '/'
             }, {
-                text: '学习笔记',
+                text: '链接',
                 items: [
-                    { text: '笔记', link: '/' },
                 ]
             }
         ],
         sidebar: [
-            '/', '/es/','/class/','/design-pattern/','/inherit/','/event/','/promise/','/data-response/'
+            '/', '/flex/', '/grid/'
         ]
     }
 }
