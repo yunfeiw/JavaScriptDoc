@@ -7,49 +7,44 @@
   <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1">
 
   <style>
+    * { margin: 0; }
+    html, body { height: 100%;}
+
+    .content { width: 100vw; height: 100vh; }
+
     .box {
-      width: 500px;
+      width: 400px;
       height: 500px;
-      display: grid;
-      grid-template: repeat(4,100px)/repeat(5,100px);
-      justify-content: center;
-      align-content: center;
-      grid-gap:10px;
+      background: red;
     }
 
-    .item {
-      background: #0a56bb;
-      box-sizing: border-box;
-      border: 1px solid #fff;
-    }
-    .item:nth-child(2){
-      grid-column-start:2;
-      grid-column-end:5;
+    .active {
+      width: 500px;
+      height: 300px;
+      background: blue;
     }
   </style>
 </head>
 
 <body>
-  <div class="box">
-    <div class="item"></div>
-    <div class="item"></div>
-    <div class="item"></div>
-    <div class="item"></div>
-    <div class="item"></div>
-    
-    <div class="item"></div>
-    <div class="item"></div>
-    <div class="item"></div>
-    <div class="item"></div>
-    <div class="item"></div>
-    
-    <div class="item"></div>
-    <div class="item"></div>
-    <div class="item"></div>
-    <div class="item"></div>
-    <div class="item"></div>
-    
+  <div class="content">
+    <div class="box"></div>
   </div>
+  <script>
+    let box = document.querySelector('.box');
+    window.addEventListener('orientationchange',function(){
+      console.log(window.orientation)
+
+      switch(window.orientation){
+        case 90:
+        case -90:
+          box.classList.add('active');
+          break;
+        default:
+        box.classList.remove('active');
+      }
+    })
+  </script>
 </body>
 
 </html>

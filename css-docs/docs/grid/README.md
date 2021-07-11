@@ -196,7 +196,61 @@ grid-template: 1fr 80% 1fr/repeat(auto-fill,100px);
 ![3](/assets/img/grid/4.png)
 
 
+#### 换种写法
+grid-template-areas
+```html
+<style>
+    .box {
+      width: 500px;
+      height: 500px;
+      display: grid;
+      grid-template: repeat(4,100px)/repeat(5,100px);
+      justify-content: center;
+      align-content: center;
+      grid-gap:10px;
 
+      grid-template-areas: 
+        'a a a d'
+        'e e h g'
+        'e e j g'
+      ;
+    }
+
+    .item {
+      background: #0a56bb;
+      box-sizing: border-box;
+      border: 1px solid #fff;
+    }
+    .item:nth-child(1){
+      grid-area: a;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="box">
+    <div class="item"></div>
+    <div class="item"></div>
+    <div class="item"></div>
+    <div class="item"></div>
+    <div class="item"></div>
+    
+    <div class="item"></div>
+    <div class="item"></div>
+    <div class="item"></div>
+    <div class="item"></div>
+    <div class="item"></div>
+    
+    <div class="item"></div>
+    <div class="item"></div>
+    <div class="item"></div>
+    <div class="item"></div>
+    <div class="item"></div>
+    
+  </div>
+```
+
+![3](/assets/img/grid/4.png)
 
 
 ### 合并单元格
