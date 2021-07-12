@@ -13,14 +13,15 @@ module.exports = {
             {
                 text: '概述',
                 link: '/'
-            }, {
-                text: '链接',
-                items: [
-                ]
             }
+            // , {
+            //     text: '链接',
+            //     items: [
+            //     ]
+            // }
         ],
         sidebar: [
-            '/', '/flex/', '/grid/'
+            '/', '/selector/', '/box/', '/bfc/', '/flex/', '/grid/'
         ]
     }
 }

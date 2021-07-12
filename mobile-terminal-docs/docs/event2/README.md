@@ -1,4 +1,4 @@
-## 移动端事件2
+## 移动端事件 2
 
 ## 横竖屏检测
 
@@ -6,7 +6,10 @@
 - 事件监听 orientationchange
 
 ### landscape
+
 通过使用 orientation:landscape
+
+```html
 <style>
     * {
       margin: 0;
@@ -44,11 +47,13 @@
     <div class="box"></div>
   </div>
 </body>
+```
 
-- orientationchang事件
+- orientationchang 事件
 
 ```html
-* { margin: 0; }
+  <style>
+    * { margin: 0; }
     html, body { height: 100%;}
 
     .content { width: 100vw; height: 100vh; }
@@ -91,26 +96,23 @@
 
 ## 加速度检测
 
-监听window事件 `devicemotion`
+监听 window 事件 `devicemotion`
 
 ```html
-<div class="box">
-
-</div>
+<div class="box"></div>
 
 <script>
-    let box = document.querySelector('.box');
-    window.addEventListener('devicemotion',function(ev){
-        let motion = ev.acceleration  //当前手机的加速度；
-        let {x,y,z} = motion;
-        box.innerHTML = `
+  let box = document.querySelector(".box");
+  window.addEventListener("devicemotion", function(ev) {
+    let motion = ev.acceleration; //当前手机的加速度；
+    let { x, y, z } = motion;
+    box.innerHTML = `
             x轴：${x.toFixed(2)}<br>
             y轴：${y.toFixed(2)}<br>
             z轴：${z.toFixed(2)}
-        `
-    })
+        `;
+  });
 </script>
-
 ```
 
 ### 例子 晃动的小球
@@ -153,30 +155,28 @@
 
 ### 重力加速度
 
-accelerationIncludingGravity  当前手机的重力加速度
+accelerationIncludingGravity 当前手机的重力加速度
 
 ```html
-
-<div class="box">
-
-</div>
+<div class="box"></div>
 
 <script>
-    let box = document.querySelector('.box');
-    window.addEventListener('devicemotion',function(e){
-        let motion = e.acceleration;// 当前手机加速度
-        let gravity = e.accelerationIncludingGravity //重力加速度
+  let box = document.querySelector(".box");
+  window.addEventListener("devicemotion", function(e) {
+    let motion = e.acceleration; // 当前手机加速度
+    let gravity = e.accelerationIncludingGravity; //重力加速度
 
-        let {x,y,z} = motion;
-        let {x:a,y:b,z:c} = gravity;
-        box.innerHTML = `
+    let { x, y, z } = motion;
+    let { x: a, y: b, z: c } = gravity;
+    box.innerHTML = `
             x轴：${a.toFixed(2)}<br>
             y轴：${b.toFixed(2)}<br>
             z轴：${c.toFixed(2)}
-        `
-    })
+        `;
+  });
 </script>
 ```
+
 ### 栗子 移动的小方块
 
 ```html
@@ -215,7 +215,7 @@ accelerationIncludingGravity  当前手机的重力加速度
 
         a -= x;
         b -= y;
-        // 注意下手机的 坐标系 
+        // 注意下手机的 坐标系
         tx -= a;
         ty += b;
 
@@ -226,11 +226,10 @@ accelerationIncludingGravity  当前手机的重力加速度
 
 ![坐标](/assets/img/event2/zuobiao.png)
 
-
 ## 兼容
 
-- 加速度的取值  ios和安卓是相反的
-- ios9之后，必须用https才能调用传感器  页面必须使用https协议，才能给你权限调用传感器
-- ios12.2之后，用户必须在设备中打开"动作与方向的访问权限"
-- ios13之后，ios要求使用"动作与方向的访问权限",必须用户授权
-- ios14之后，动作与方向的访问权限必须用户手动触发，而且找不到修改入口
+- 加速度的取值 ios 和安卓是相反的
+- ios9 之后，必须用 https 才能调用传感器 页面必须使用 https 协议，才能给你权限调用传感器
+- ios12.2 之后，用户必须在设备中打开"动作与方向的访问权限"
+- ios13 之后，ios 要求使用"动作与方向的访问权限",必须用户授权
+- ios14 之后，动作与方向的访问权限必须用户手动触发，而且找不到修改入口
