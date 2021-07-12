@@ -21,7 +21,7 @@ module.exports = {
             }
         ],
         sidebar: [
-            '/', '/layout/', '/event/', '/event2/','/applets/'
+            '/', '/layout/', '/event/', '/applets/', '/official-account/'
         ]
     }
 }

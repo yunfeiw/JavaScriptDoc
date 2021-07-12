@@ -20,10 +20,11 @@ module.exports = {
             }
         ],
         sidebar: [
-            '/', '/es/','/class/',
-            '/design-pattern/','/inherit/',
-            '/event/','/promise/',
-            '/data-response/','/throttle-antiShake/'
+            '/', '/es/', '/class/',
+            '/design-pattern/', '/inherit/',
+            '/event/', '/promise/',
+            '/data-response/', '/throttle-antiShake/',
+            '/function/'
         ]
     }
 }
